@@ -14,7 +14,7 @@ namespace webScraperTest
 
             while (true)
             {
-                //Kanji to search for:
+                //Kanji search.
                 Console.WriteLine("Input Kanji/Kanji word:");
                 String kanji = Console.ReadLine();
 
@@ -39,17 +39,28 @@ namespace webScraperTest
 
                 //Get Meaning(s)
                 var meaningNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
-                int index = 1;
+                int meaningNum = 1;
 
                 foreach (var node in meaningNodes)
                 {
-                    Console.WriteLine($"Meaning: {index}. {node.InnerHtml}\n");
-                    index++;
+                    Console.WriteLine($"Meaning: {meaningNum}. {node.InnerHtml}\n");
+                    meaningNum++;
                 }
 
                 //Get tags
+                var tagNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
+                int tagNum = 1;
 
+                foreach (var node in tagNodes)
+                {
+                    Console.WriteLine($"Tags: {tagNum}. {node.InnerHtml}\n");
+                    tagNum++;
+                }
+               
+                
                 //Get example sentence
+
+                //Get JMdict ID. 
             }
 
 
