@@ -11,12 +11,12 @@ namespace webScraperTest
             //UTF-8 for correct display of kanji.
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-
+            
             while (true)
             {
                 //Kanji search.
-                Console.WriteLine("Input Kanji/Kanji word:");
-                String kanji = Console.ReadLine();
+                Console.WriteLine("'stop' to exit program\nInput Kanji/Kanji word:");
+                String kanji = Console.ReadLine().Trim();
 
                 if (kanji == "stop")
                 {
@@ -56,11 +56,40 @@ namespace webScraperTest
                     Console.WriteLine($"Tags: {tagNum}. {node.InnerHtml}\n");
                     tagNum++;
                 }
-               
-                
-                //Get example sentence
 
-                //Get JMdict ID. 
+
+                //Get example sentence
+                Console.WriteLine("Example Sentence");
+
+                //Get JMdict ID 
+
+                var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
+
+                //example request: <a href="https://www.edrdg.org/jmwsgi/edform.py?svc=jmdict&amp;sid=&amp;q=1316240&amp;a=2">Edit in JMdict</a>
+
+                List<char> JMdictIDSet = new List<char>();
+
+                foreach (var node in JMdictIDNodes) 
+                {
+                    if (node.OuterHtml.StartsWith("<a href=\"https://www.edrdg.org"))
+                    {
+                        //Console.WriteLine(node.OuterHtml);
+                        //Console.WriteLine(node.OuterHtml.Substring(74));
+                        //Console.WriteLine(node.OuterLength);
+
+                        foreach (char c in node.OuterHtml.Substring(74))
+                        {
+                            if (!char.IsNumber(c)) { break; }
+                            JMdictIDSet.Add(c);
+                        }
+                       
+                    }
+
+                }
+                Console.WriteLine("JMdictID: " + string.Join("", JMdictIDSet));
+
+
+                //Get Pitch accent
             }
 
 
