@@ -24,14 +24,14 @@ namespace webScraperTest
                 }
 
                 //Get request jisho.org
-                string url = $"https://jisho.org/word/{kanji}";
-                Console.WriteLine(url);
+                string kanjiURL = $"https://jisho.org/word/{kanji}";
+                Console.WriteLine(kanjiURL);
                 var httpClient = new HttpClient();
-                var hmtl = httpClient.GetStringAsync(url).Result;
+                var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(hmtl);
 
-                //Get furigana
+                //Get Furigana
                 var furiganaElement = htmlDocument.DocumentNode.SelectSingleNode("//span[@class='furigana']");
                 var furigana = furiganaElement.InnerText.Trim();
 
@@ -47,7 +47,7 @@ namespace webScraperTest
                     meaningNum++;
                 }
 
-                //Get tags
+                //Get Tags
                 var tagNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
                 int tagNum = 1;
 
@@ -57,16 +57,10 @@ namespace webScraperTest
                     tagNum++;
                 }
 
-
-                //Get example sentence
-                Console.WriteLine("Example Sentence");
-
                 //Get JMdict ID 
-
-                var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
-
                 //example request: <a href="https://www.edrdg.org/jmwsgi/edform.py?svc=jmdict&amp;sid=&amp;q=1316240&amp;a=2">Edit in JMdict</a>
 
+                var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
                 List<char> JMdictIDSet = new List<char>();
 
                 foreach (var node in JMdictIDNodes) 
@@ -88,8 +82,33 @@ namespace webScraperTest
                 }
                 Console.WriteLine("JMdictID: " + string.Join("", JMdictIDSet));
 
+                //Get example sentence
+                //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
+                /*
+                int page = 1;
+
+                string sentenceURL = $"https://tatoeba.org/en/sentences/search?from=jpn&query={kanji}&to=eng&page={page}";
+                var httpClient2 = new HttpClient();
+                var hmtl2 = httpClient2.GetStringAsync(sentenceURL).Result;
+                var htmlDocument2 = new HtmlDocument();
+                htmlDocument2.LoadHtml(hmtl2);
+
+                var sentenceNodes = htmlDocument2.DocumentNode.SelectNodes("//span[@class='layout-align-start-center layout-row flex']");
+
+                foreach (var node in sentenceNodes)
+                {
+                    if (node == null)
+                    {
+                        Console.WriteLine("Null!");
+                        continue;
+                    }
+                    Console.WriteLine($"Sentence: {node.InnerHtml}");
+                    meaningNum++;
+                }
+                */
 
                 //Get Pitch accent
+
             }
 
 
