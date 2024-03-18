@@ -1,8 +1,10 @@
 ﻿using HtmlAgilityPack;
 using System.Dynamic;
+using System.IO.Enumeration;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Xml.Linq;
 
 namespace webScraperTest
 {
@@ -19,31 +21,41 @@ namespace webScraperTest
 
                     return documentElementValue;
                 }
-                else if (nodeType == "SelectNodes")
-                {
-                    var documentElement = HTMLDocument.DocumentNode.SelectNodes(xpath);
-                    List<string> elementNodes = new List<string>();
-
-                    foreach (var node in documentElement)
-                    {
-                        elementNodes.Add(node.InnerHtml);
-                    }
-
-                    string strElementNodes = String.Join("|", elementNodes);
-
-                    return strElementNodes;
-                }
                 else
                 {
-                    Console.WriteLine("Cant find Elements!");
                     return "NOT FOUND";
                 } 
 
             }
         }
 
-        public static void writeToFile(string JMdictID, string kanji, string furigana, string meanings, string tags)
+        public static void writeToFile(List<string> kanjiInfo)
         {
+            Console.WriteLine("Save as filename: ");
+            string input = Console.ReadLine().Trim();
+
+            string fileName = $"{input}.txt";
+            string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
+            
+            try
+            {
+                using (FileStream fs = File.Create(filePath))
+                {
+                    Console.WriteLine("File created successfully! " + filePath);
+
+                    using (StreamWriter writer = new StreamWriter(fs))
+                    {
+                        writer.Write($"");
+                        writer.Write('\n');
+                    }
+
+                    fs.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+            }
 
         }
 
@@ -52,7 +64,9 @@ namespace webScraperTest
             //UTF-8 for correct display of kanji.
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
-            
+
+            List<string> kanjiList = new List<string>();
+
             while (true)
             {
                 //Kanji search.
@@ -90,21 +104,46 @@ namespace webScraperTest
 
                 }
                 string JMdictID = string.Join("", JMdictIDList);
+                kanjiList.Add(JMdictID);
+
                 Console.WriteLine($"JMdictID: {JMdictID}");
 
                 //Get Furigana
                 string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
+                kanjiList.Add(furigana);
+
                 Console.WriteLine($"Furigana: {furigana}");
 
                 //Get Meaning(s)
-                string meanings = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//span[@class='meaning-meaning']");
+                var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
+                List<string> meaningsList = new List<string>();
 
-                Console.WriteLine($"Meanings: {meanings}");
+                foreach (var node in meaningsNodes)
+                {
+                    meaningsList.Add(node.InnerHtml);
+                }
+                string meanings = String.Join("|", meaningsList);
+                kanjiList.Add(meanings);
+
+                Console.WriteLine($"Meanins: {meanings}");
 
                 //Get Tags
-                string tags = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//div[@class='meaning-tags']");
+                var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
+                List<string> tagsList = new List<string>();
+                string[] tagsBlackList = ["Wikipedia definition"];
+
+                foreach (var node in tagsNodes)
+                {
+                    if (tagsBlackList.Contains(node.InnerHtml)) { continue; }
+                    tagsList.Add(node.InnerHtml);
+                }
+                string tags= String.Join("|", tagsList);
+                kanjiList.Add(tags);
 
                 Console.WriteLine($"Tags: {tags}");
+
+                foreach (string s in kanjiList) { Console.WriteLine($"KANJILIST:{s}"); }
+
 
                 //Get example sentence
                 //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
@@ -130,7 +169,7 @@ namespace webScraperTest
                     meaningNum++;
                 }
                 */
-                writeToFile(JMdictID, kanji, furigana, meanings, tags);
+                writeToFile(kanjiList);
             }
 
 
