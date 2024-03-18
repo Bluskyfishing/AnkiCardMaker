@@ -29,7 +29,7 @@ namespace webScraperTest
             }
         }
 
-        public static void writeToFile(List<string> kanjiInfo)
+        public static void writeToFile(List<string[]> kanjiInfo)
         {
             Console.WriteLine("Save as filename: ");
             string input = Console.ReadLine().Trim();
@@ -45,7 +45,7 @@ namespace webScraperTest
 
                     using (StreamWriter writer = new StreamWriter(fs))
                     {
-                        foreach (string item in kanjiInfo)
+                        foreach (string[] item in kanjiInfo)
                         {
                             writer.Write(item + ";");
                         }
@@ -67,10 +67,11 @@ namespace webScraperTest
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
 
+            List<string[]> allKanjiList = new List<string[]>();
 
             while (true)
             {
-                string[] kanjiList = new string[5];
+                string[] kanjiArray = new string[5];
 
                 //Kanji search.
                 Console.WriteLine("'x' to exit program\nInput Kanji/Kanji word:");
@@ -81,7 +82,12 @@ namespace webScraperTest
                     break;
                 }
 
-                kanjiList[0] = kanji;
+                if (kanji == "add" && allKanjiList.Count > 0)
+                {
+                    writeToFile(allKanjiList);
+                }
+
+                kanjiArray[0] = kanji;
 
                 //Get request jisho.org
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
@@ -109,7 +115,7 @@ namespace webScraperTest
 
                 }
                 string JMdictID = string.Join("", JMdictIDList);
-                kanjiList[1] = JMdictID;
+                kanjiArray[1] = JMdictID;
 
                 Console.WriteLine($"JMdictID: {JMdictID}");
 
@@ -117,7 +123,7 @@ namespace webScraperTest
                 string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
 
                 Console.WriteLine($"Furigana: {furigana}");
-                kanjiList[2] = furigana;
+                kanjiArray[2] = furigana;
 
                 //Get Meaning(s)
                 var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
@@ -128,7 +134,7 @@ namespace webScraperTest
                     meaningsList.Add(node.InnerHtml);
                 }
                 string meanings = String.Join("|", meaningsList);
-                kanjiList[3] = meanings;
+                kanjiArray[3] = meanings;
 
                 Console.WriteLine($"Meanins: {meanings}");
 
@@ -143,13 +149,21 @@ namespace webScraperTest
                     tagsList.Add(node.InnerHtml);
                 }
                 string tags= String.Join("|", tagsList);
-                kanjiList[4] = tags;
+                kanjiArray[4] = tags;
 
                 Console.WriteLine($"Tags: {tags}");
 
-                foreach (string s in kanjiList) { Console.WriteLine($"KANJILIST:{s}"); }
+                foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
 
-
+                if (kanjiArray.Length == 5)
+                {
+                    allKanjiList.Add(kanjiArray);
+                }
+                else 
+                { 
+                    Console.WriteLine("Not enough info to add!"); 
+                }
+                
                 //Get example sentence
                 //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
                 /*
