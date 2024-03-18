@@ -41,16 +41,19 @@ namespace webScraperTest
             {
                 using (FileStream fs = File.Create(filePath))
                 {
-                    Console.WriteLine("File created successfully! " + filePath);
-
                     using (StreamWriter writer = new StreamWriter(fs))
                     {
-                        foreach (string[] item in kanjiInfo)
+                        foreach (string[] array in kanjiInfo)
                         {
-                            writer.Write(item + ";");
+                            foreach (string element in array)
+                            {
+                                writer.Write('"' + element + '"');
+                                writer.Write(";");
+                            }
+                            writer.Write('\n'); 
                         }
                     }
-
+                    Console.WriteLine("File created successfully! " + filePath);
                     fs.Close();
                 }
             }
@@ -73,8 +76,18 @@ namespace webScraperTest
             {
                 string[] kanjiArray = new string[5];
 
-                //Kanji search.
-                Console.WriteLine("'x' to exit program\nInput Kanji/Kanji word:");
+                //Menu//
+                if (allKanjiList.Count != 0 ) 
+                {
+                    //Console.Clear();
+                    Console.WriteLine("Kanji to be added.:");
+                    foreach (string[] array in allKanjiList)
+                    {
+                        Console.Write(array[0] + ", ");
+                    }
+                    Console.WriteLine("\n");
+                }
+                Console.WriteLine("'x' to exit program\n'add' to add all kanji!\nInput Kanji/Kanji word:");
                 String kanji = Console.ReadLine().Trim();
 
                 if (kanji == "x")
@@ -85,9 +98,12 @@ namespace webScraperTest
                 if (kanji == "add" && allKanjiList.Count > 0)
                 {
                     writeToFile(allKanjiList);
+                    break;
                 }
 
                 kanjiArray[0] = kanji;
+
+                //Kanji search
 
                 //Get request jisho.org
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
@@ -133,7 +149,7 @@ namespace webScraperTest
                 {
                     meaningsList.Add(node.InnerHtml);
                 }
-                string meanings = String.Join("|", meaningsList);
+                string meanings = String.Join("-", meaningsList);
                 kanjiArray[3] = meanings;
 
                 Console.WriteLine($"Meanins: {meanings}");
@@ -148,7 +164,7 @@ namespace webScraperTest
                     if (tagsBlackList.Contains(node.InnerHtml)) { continue; }
                     tagsList.Add(node.InnerHtml);
                 }
-                string tags= String.Join("|", tagsList);
+                string tags= String.Join("-", tagsList);
                 kanjiArray[4] = tags;
 
                 Console.WriteLine($"Tags: {tags}");
