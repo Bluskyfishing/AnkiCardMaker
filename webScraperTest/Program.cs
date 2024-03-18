@@ -6,6 +6,40 @@ namespace webScraperTest
 {
     internal class Program
     {
+        public static class HTMLParser
+        {
+            public static string getHTMLNode(HtmlDocument HTMLDocument, string nodeType, string xpath)
+            {
+                if (nodeType == "SelectSingleNode")
+                {
+                    var documentElement = HTMLDocument.DocumentNode.SelectSingleNode(xpath);
+                    var documentElementValue = documentElement.InnerText.Trim();
+
+                    return documentElementValue;
+                }
+                else if (nodeType == "SelectNodes")
+                {
+                    var documentElement = HTMLDocument.DocumentNode.SelectNodes(xpath);
+                    List<string> elementNodes = new List<string>();
+
+                    foreach (var node in documentElement)
+                    {
+                        elementNodes.Add(node.InnerHtml);
+                    }
+
+                    string strElementNodes = String.Join("|", elementNodes);
+
+                    return strElementNodes;
+                }
+                else
+                {
+                    Console.WriteLine("Cant find Elements!");
+                    return "NOT FOUND";
+                } 
+
+            }
+        }
+
         static void Main(string[] args)
         {
             //UTF-8 for correct display of kanji.
@@ -32,55 +66,38 @@ namespace webScraperTest
                 htmlDocument.LoadHtml(hmtl);
 
                 //Get Furigana
-                var furiganaElement = htmlDocument.DocumentNode.SelectSingleNode("//span[@class='furigana']");
-                var furigana = furiganaElement.InnerText.Trim();
-
+                string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
                 Console.WriteLine($"Furigana: {furigana}");
 
-                //Get Meaning(s)
-                var meaningNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
-                int meaningNum = 1;
 
-                foreach (var node in meaningNodes)
-                {
-                    Console.WriteLine($"Meaning: {meaningNum}. {node.InnerHtml}\n");
-                    meaningNum++;
-                }
+                //Get Meaning(s)
+                string meanings = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//span[@class='meaning-meaning']");
+
+                Console.WriteLine(meanings);
 
                 //Get Tags
-                var tagNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
-                int tagNum = 1;
+                string tags = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//div[@class='meaning-tags']");
 
-                foreach (var node in tagNodes)
-                {
-                    Console.WriteLine($"Tags: {tagNum}. {node.InnerHtml}\n");
-                    tagNum++;
-                }
+                Console.WriteLine(tags);
 
                 //Get JMdict ID 
-                //example request: <a href="https://www.edrdg.org/jmwsgi/edform.py?svc=jmdict&amp;sid=&amp;q=1316240&amp;a=2">Edit in JMdict</a>
-
                 var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
-                List<char> JMdictIDSet = new List<char>();
+                List<char> JMdictIDList = new List<char>();
 
                 foreach (var node in JMdictIDNodes) 
                 {
                     if (node.OuterHtml.StartsWith("<a href=\"https://www.edrdg.org"))
                     {
-                        //Console.WriteLine(node.OuterHtml);
-                        //Console.WriteLine(node.OuterHtml.Substring(74));
-                        //Console.WriteLine(node.OuterLength);
-
                         foreach (char c in node.OuterHtml.Substring(74))
                         {
                             if (!char.IsNumber(c)) { break; }
-                            JMdictIDSet.Add(c);
+                            JMdictIDList.Add(c);
                         }
                        
                     }
 
                 }
-                Console.WriteLine("JMdictID: " + string.Join("", JMdictIDSet));
+                Console.WriteLine("JMdictID: " + string.Join("", JMdictIDList));
 
                 //Get example sentence
                 //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
