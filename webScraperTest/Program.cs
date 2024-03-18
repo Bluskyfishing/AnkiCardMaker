@@ -45,10 +45,22 @@ namespace webScraperTest
                     {
                         foreach (string[] array in kanjiInfo)
                         {
+                            //array = [kanji, JMdictID, furigana, meanings, tags]
                             foreach (string element in array)
                             {
-                                writer.Write('"' + element + '"');
-                                writer.Write(";");
+                                if (element == array[3])
+                                {
+                                    string breakElement = element.Replace("-", " <br /> "); //splits up meanings. still not numbered.
+                                    writer.Write('"' + breakElement + '"' + ";"); 
+                                    continue;
+                                }
+                                else if (element == array[4])
+                                {
+                                    string breakElement = element.Replace("-", " ");
+                                    writer.Write('"' + breakElement + '"' + ";"); //";" to autofill tags when importing:
+                                    continue;
+                                }
+                                writer.Write('"' + element + '"' + ";");
                             }
                             writer.Write('\n'); 
                         }
