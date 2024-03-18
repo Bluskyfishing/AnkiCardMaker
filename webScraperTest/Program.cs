@@ -45,8 +45,10 @@ namespace webScraperTest
 
                     using (StreamWriter writer = new StreamWriter(fs))
                     {
-                        writer.Write($"");
-                        writer.Write('\n');
+                        foreach (string item in kanjiInfo)
+                        {
+                            writer.Write(item + ";");
+                        }
                     }
 
                     fs.Close();
@@ -65,18 +67,21 @@ namespace webScraperTest
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
 
-            List<string> kanjiList = new List<string>();
 
             while (true)
             {
+                string[] kanjiList = new string[5];
+
                 //Kanji search.
-                Console.WriteLine("'stop' to exit program\nInput Kanji/Kanji word:");
+                Console.WriteLine("'x' to exit program\nInput Kanji/Kanji word:");
                 String kanji = Console.ReadLine().Trim();
 
-                if (kanji == "stop")
+                if (kanji == "x")
                 {
                     break;
                 }
+
+                kanjiList[0] = kanji;
 
                 //Get request jisho.org
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
@@ -104,15 +109,15 @@ namespace webScraperTest
 
                 }
                 string JMdictID = string.Join("", JMdictIDList);
-                kanjiList.Add(JMdictID);
+                kanjiList[1] = JMdictID;
 
                 Console.WriteLine($"JMdictID: {JMdictID}");
 
                 //Get Furigana
                 string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
-                kanjiList.Add(furigana);
 
                 Console.WriteLine($"Furigana: {furigana}");
+                kanjiList[2] = furigana;
 
                 //Get Meaning(s)
                 var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
@@ -123,7 +128,7 @@ namespace webScraperTest
                     meaningsList.Add(node.InnerHtml);
                 }
                 string meanings = String.Join("|", meaningsList);
-                kanjiList.Add(meanings);
+                kanjiList[3] = meanings;
 
                 Console.WriteLine($"Meanins: {meanings}");
 
@@ -138,7 +143,7 @@ namespace webScraperTest
                     tagsList.Add(node.InnerHtml);
                 }
                 string tags= String.Join("|", tagsList);
-                kanjiList.Add(tags);
+                kanjiList[4] = tags;
 
                 Console.WriteLine($"Tags: {tags}");
 
@@ -169,7 +174,6 @@ namespace webScraperTest
                     meaningNum++;
                 }
                 */
-                writeToFile(kanjiList);
             }
 
 
