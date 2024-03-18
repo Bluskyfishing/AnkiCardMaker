@@ -1,5 +1,7 @@
 ﻿using HtmlAgilityPack;
 using System.Dynamic;
+using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace webScraperTest
@@ -40,6 +42,11 @@ namespace webScraperTest
             }
         }
 
+        public static void writeToFile(string JMdictID, string kanji, string furigana, string meanings, string tags)
+        {
+
+        }
+
         static void Main(string[] args)
         {
             //UTF-8 for correct display of kanji.
@@ -65,26 +72,11 @@ namespace webScraperTest
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(hmtl);
 
-                //Get Furigana
-                string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
-                Console.WriteLine($"Furigana: {furigana}");
-
-
-                //Get Meaning(s)
-                string meanings = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//span[@class='meaning-meaning']");
-
-                Console.WriteLine(meanings);
-
-                //Get Tags
-                string tags = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//div[@class='meaning-tags']");
-
-                Console.WriteLine(tags);
-
                 //Get JMdict ID 
                 var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
                 List<char> JMdictIDList = new List<char>();
 
-                foreach (var node in JMdictIDNodes) 
+                foreach (var node in JMdictIDNodes)
                 {
                     if (node.OuterHtml.StartsWith("<a href=\"https://www.edrdg.org"))
                     {
@@ -93,11 +85,26 @@ namespace webScraperTest
                             if (!char.IsNumber(c)) { break; }
                             JMdictIDList.Add(c);
                         }
-                       
+
                     }
 
                 }
-                Console.WriteLine("JMdictID: " + string.Join("", JMdictIDList));
+                string JMdictID = string.Join("", JMdictIDList);
+                Console.WriteLine($"JMdictID: {JMdictID}");
+
+                //Get Furigana
+                string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
+                Console.WriteLine($"Furigana: {furigana}");
+
+                //Get Meaning(s)
+                string meanings = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//span[@class='meaning-meaning']");
+
+                Console.WriteLine($"Meanings: {meanings}");
+
+                //Get Tags
+                string tags = HTMLParser.getHTMLNode(htmlDocument, "SelectNodes", "//div[@class='meaning-tags']");
+
+                Console.WriteLine($"Tags: {tags}");
 
                 //Get example sentence
                 //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
@@ -123,9 +130,7 @@ namespace webScraperTest
                     meaningNum++;
                 }
                 */
-
-                //Get Pitch accent
-
+                writeToFile(JMdictID, kanji, furigana, meanings, tags);
             }
 
 
