@@ -119,7 +119,7 @@ namespace webScraperTest
 
                 //Get request jisho.org
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
-                Console.WriteLine(kanjiURL);
+                //Console.WriteLine(kanjiURL);
                 var httpClient = new HttpClient();
                 var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 var htmlDocument = new HtmlDocument();
@@ -145,26 +145,33 @@ namespace webScraperTest
                 string JMdictID = string.Join("", JMdictIDList);
                 kanjiArray[1] = JMdictID;
 
-                Console.WriteLine($"JMdictID: {JMdictID}");
+                //Console.WriteLine($"JMdictID: {JMdictID}");
 
                 //Get Furigana
                 string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
 
-                Console.WriteLine($"Furigana: {furigana}");
+                //Console.WriteLine($"Furigana: {furigana}");
                 kanjiArray[2] = furigana;
 
                 //Get Meaning(s)
                 var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
+
                 List<string> meaningsList = new List<string>();
+
+                string[] meaningsBlackList = ["unit"];
+
+                int num = 1;
 
                 foreach (var node in meaningsNodes)
                 {
-                    meaningsList.Add(node.InnerHtml);
+                    if (meaningsBlackList.Contains(node.InnerHtml)) { continue; }
+                    meaningsList.Add($"{num}. {node.InnerHtml}");
+                    num++;
                 }
                 string meanings = String.Join("-", meaningsList);
                 kanjiArray[3] = meanings;
 
-                Console.WriteLine($"Meanins: {meanings}");
+                //Console.WriteLine($"Meanins: {meanings}");
 
                 //Get Tags
                 var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
@@ -176,13 +183,17 @@ namespace webScraperTest
                     if (tagsBlackList.Contains(node.InnerHtml)) { continue; }
                     tagsList.Add(node.InnerHtml);
                 }
-                string tags= String.Join("-", tagsList);
+                string strTagList = String.Join("-", tagsList); //separates different tags with "-".
+                string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
+                string tags = sentencTags.Replace("&#39", "'"); //fixes weird unicode bug.
                 kanjiArray[4] = tags;
 
-                Console.WriteLine($"Tags: {tags}");
+                //Console.WriteLine($"Tags: {tags}");
 
+                //print of array:
                 foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
 
+                //Check if everything is in list.
                 if (kanjiArray.Length == 5)
                 {
                     allKanjiList.Add(kanjiArray);
