@@ -119,7 +119,6 @@ namespace webScraperTest
 
                 //Get request jisho.org
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
-                //Console.WriteLine(kanjiURL);
                 var httpClient = new HttpClient();
                 var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 var htmlDocument = new HtmlDocument();
