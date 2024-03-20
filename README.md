@@ -28,15 +28,15 @@ Card Type Settings: <br>
 **Front Template:**
 
 ```
-<div class=big>{{Kanji}}</div>
 <div class=small>{{hint:Furigana}}</div>
+<div class=big>{{Kanji}}</div>
 ```
 **Back Template:**
 ```
 <a href="kanjistudy://word?id={{JMdictID}}">
 
-<div class=big>{{Kanji}}</div>
 <div class=small>{{Furigana}}</div>
+<div class=big>{{Kanji}}</div>
 
 </a><br>{{Meaning}}</div>
 
@@ -83,3 +83,4 @@ Check that every line is filled out before importing:
 <h4>Additional reccomendation:</h4>
 Anki addon for pitch accent:
 https://ankiweb.net/shared/info/148002038
+I like to apply the pitch accent on the meaning field! :)
