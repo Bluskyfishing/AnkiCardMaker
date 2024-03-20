@@ -193,7 +193,7 @@ namespace webScraperTest
             while (true)
             {
                 //Menu//
-                if (allKanjiList.Count != 0 ) 
+                if (allKanjiList.Count != 0)
                 {
                     Console.WriteLine("Kanji to be added:");
                     foreach (string[] array in allKanjiList)
@@ -202,7 +202,7 @@ namespace webScraperTest
                     }
                     Console.WriteLine("\n");
                 }
-                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add a csv-string of kanji.\nInput Kanji/Kanji word:");
+                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add a space-string of kanji.\nInput Kanji/Kanji word:");
 
                 String kanji = Console.ReadLine().Trim().ToLower();
 
@@ -221,10 +221,10 @@ namespace webScraperTest
                 if (kanji == "b") //bulk add kanji
                 {
                     Console.Clear();
-                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by comma ('x,y,z'):");
+                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by space ('x y z'):");
 
                     string csvKanjiInput = Console.ReadLine().ToLower();
-                    string[] csvKanji = csvKanjiInput.Split(",");
+                    string[] csvKanji = csvKanjiInput.Split(" ");
 
                     foreach (string word in csvKanji)
                     {
