@@ -103,7 +103,7 @@ namespace webScraperTest
             catch (AggregateException)
             {
                 //Console.Clear();
-                Console.WriteLine("Unable to find kanji! Please Try again!");
+                Console.WriteLine($"Unable to find kanji:{kanji}\nPlease Try again!");
                 return new List<string[]>();
             }
             //Console.Clear();
@@ -202,7 +202,7 @@ namespace webScraperTest
                     }
                     Console.WriteLine("\n");
                 }
-                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add space-string kanji.\nInput Kanji/Kanji word:");
+                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add comma separated kanji text.\nInput Kanji/Kanji word:");
 
                 String kanji = Console.ReadLine().Trim().ToLower();
 
@@ -221,10 +221,10 @@ namespace webScraperTest
                 if (kanji == "b") //bulk add kanji
                 {
                     Console.Clear();
-                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by space ('x y z'):");
+                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by , ('x,y,z'):");
 
                     string csvKanjiInput = Console.ReadLine().ToLower();
-                    string[] csvKanji = csvKanjiInput.Split(" ");
+                    string[] csvKanji = csvKanjiInput.Split(",");
 
                     foreach (string word in csvKanji)
                     {
@@ -240,7 +240,7 @@ namespace webScraperTest
                 //Note 直 shows old kanji. 
             }
 
-
+            Console.ReadLine(); //stops console from closing.
         }
     }
 }
