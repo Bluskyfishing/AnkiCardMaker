@@ -5,6 +5,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace webScraperTest
 {
@@ -92,7 +93,6 @@ namespace webScraperTest
                 //Menu//
                 if (allKanjiList.Count != 0 ) 
                 {
-                    Console.Clear();
                     Console.WriteLine("Kanji to be added:");
                     foreach (string[] array in allKanjiList)
                     {
@@ -105,6 +105,7 @@ namespace webScraperTest
 
                 if (kanji == "x")
                 {
+                    Console.WriteLine("Program closed!");
                     break;
                 }
 
@@ -116,14 +117,24 @@ namespace webScraperTest
                 kanjiArray[0] = kanji;
 
                 //Kanji search
-
                 //Get request jisho.org
-                string kanjiURL = $"https://jisho.org/word/{kanji}";
                 var httpClient = new HttpClient();
-                var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 var htmlDocument = new HtmlDocument();
-                htmlDocument.LoadHtml(hmtl);
-    
+                
+                try 
+                {
+                    string kanjiURL = $"https://jisho.org/word/{kanji}";
+                    var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
+                    htmlDocument.LoadHtml(hmtl);
+                }
+                catch (AggregateException)
+                {
+                    Console.Clear();
+                    Console.WriteLine("Unable to find kanji! Please Try again!");
+                    continue;
+                }
+                Console.Clear();
+
                 //Get JMdict ID 
                 var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
                 List<char> JMdictIDList = new List<char>();
