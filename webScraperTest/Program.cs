@@ -135,14 +135,12 @@ namespace webScraperTest
             //Get Meaning(s)
             var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
             List<string> meaningsList = new List<string>();
-            string[] meaningsBlackList = ["<spa"];
 
             int num = 1;
 
             foreach (var node in meaningsNodes)
             {
-                if (meaningsBlackList.Contains(node.InnerHtml.Substring(0, 4))) { continue; }
-                meaningsList.Add($"{num}. {node.InnerHtml}");
+                meaningsList.Add($"{num}. {node.InnerText}");
                 num++;
             }
             string meanings = String.Join("-", meaningsList);
@@ -190,55 +188,59 @@ namespace webScraperTest
 
             List<string[]> allKanjiList = new List<string[]>();
 
-            while (true)
+            try
             {
-                //Menu//
-                if (allKanjiList.Count != 0)
+                while (true)
                 {
-                    Console.WriteLine("Kanji to be added:");
-                    foreach (string[] array in allKanjiList)
+                    //Menu//
+                    if (allKanjiList.Count != 0)
                     {
-                        Console.Write(array[0] + ", ");
+                        Console.WriteLine("Kanji to be added:");
+                        foreach (string[] array in allKanjiList)
+                        {
+                            Console.Write(array[0] + ", ");
+                        }
+                        Console.WriteLine("\n");
                     }
-                    Console.WriteLine("\n");
-                }
-                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add comma separated kanji text.\nInput Kanji/Kanji word:");
+                    Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add comma separated kanji text.\nInput Kanji/Kanji word:");
 
-                String kanji = Console.ReadLine().Trim().ToLower();
+                    String kanji = Console.ReadLine().Trim().ToLower();
 
-                if (kanji == "x") //exit 
-                {
-                    Console.WriteLine("Program closed!");
-                    break;
-                }
-
-                if (kanji == "w" && allKanjiList.Count > 0) //write to file 
-                {
-                    writeToFile(allKanjiList);
-                    break;
-                }
-
-                if (kanji == "b") //bulk add kanji
-                {
-                    Console.Clear();
-                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by , ('x,y,z'):");
-
-                    string csvKanjiInput = Console.ReadLine().ToLower();
-                    string[] csvKanji = csvKanjiInput.Split(",");
-
-                    foreach (string word in csvKanji)
+                    if (kanji == "x") //exit 
                     {
-                        kanjiLookup(word, allKanjiList);
+                        Console.WriteLine("Program closed!");
+                        break;
                     }
 
-                    writeToFile(allKanjiList);
-                    break;
+                    if (kanji == "w" && allKanjiList.Count > 0) //write to file 
+                    {
+                        writeToFile(allKanjiList);
+                        break;
+                    }
+
+                    if (kanji == "b") //bulk add kanji
+                    {
+                        Console.Clear();
+                        Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by , ('x,y,z'):");
+
+                        string csvKanjiInput = Console.ReadLine().ToLower();
+                        string[] csvKanji = csvKanjiInput.Split(",");
+
+                        foreach (string word in csvKanji)
+                        {
+                            kanjiLookup(word, allKanjiList);
+                        }
+
+                        writeToFile(allKanjiList);
+                        break;
+                    }
+
+                    kanjiLookup(kanji, allKanjiList);
+
+                    //Note 直 shows old kanji. 
                 }
-
-                kanjiLookup(kanji, allKanjiList);
-
-                //Note 直 shows old kanji. 
             }
+            catch (Exception ex) { Console.WriteLine("ERROR:" + ex.Message); }
 
             Console.ReadLine(); //stops console from closing.
         }
