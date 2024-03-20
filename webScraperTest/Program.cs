@@ -64,7 +64,8 @@ namespace webScraperTest
                                 }
                                 writer.Write('"' + element + '"' + ";");
                             }
-                            writer.Write('\n'); 
+                            writer.Write('\n');
+                            writer.Close();
                         }
                     }
                     Console.WriteLine("File created successfully! " + filePath);
