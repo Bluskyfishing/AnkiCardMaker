@@ -140,6 +140,7 @@ namespace webScraperTest
 
             foreach (var node in meaningsNodes)
             {
+                if (num > 5) { continue; } //Limit of 5 meanings per kanji.
                 meaningsList.Add($"{num}. {node.InnerText}");
                 num++;
             }
