@@ -32,12 +32,15 @@ namespace webScraperTest
 
         public static void writeToFile(List<string[]> kanjiInfo)
         {
-            Console.WriteLine("Save as filename: ");
-            string input = Console.ReadLine().Trim();
+            //Console.WriteLine("Save as filename: "); //Input filename 
+            //string input = Console.ReadLine().Trim();
+            //string fileName = $"{input}.txt";
+            //string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
 
-            string fileName = $"{input}.txt";
+            string currentTimeFormated = DateTime.Now.ToString(@"mm-HH-dd-MM-yyyy"); //Time for filename. Skips the need for input of filename.
+            string fileName = $"{currentTimeFormated}.txt";
             string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
-            
+
             try
             {
                 using (FileStream fs = File.Create(filePath))
@@ -77,7 +80,7 @@ namespace webScraperTest
             }
 
         }
-
+        
         static void Main(string[] args)
         {
             //UTF-8 for correct display of kanji.
@@ -100,7 +103,7 @@ namespace webScraperTest
                     }
                     Console.WriteLine("\n");
                 }
-                Console.WriteLine("'x' to exit program\n'a' to add all kanji!\nInput Kanji/Kanji word:");
+                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add a csv-string of kanji.\nInput Kanji/Kanji word:");
                 String kanji = Console.ReadLine().Trim().ToLower();
 
                 if (kanji == "x")
@@ -109,9 +112,18 @@ namespace webScraperTest
                     break;
                 }
 
-                if (kanji == "a" && allKanjiList.Count > 0)
+                if (kanji == "w" && allKanjiList.Count > 0)
                 {
                     writeToFile(allKanjiList);
+                    break;
+                }
+
+                if (kanji == "b")
+                {
+                    Console.Clear();
+                    Console.WriteLine("BULK MODE:");
+                    string[]  csvKanji = kanji.Split(",");
+
                     break;
                 }
 
@@ -124,6 +136,7 @@ namespace webScraperTest
                 
                 try 
                 {
+                    Console.WriteLine(kanji);
                     string kanjiURL = $"https://jisho.org/word/{kanji}";
                     var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                     htmlDocument.LoadHtml(hmtl);
