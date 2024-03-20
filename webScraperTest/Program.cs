@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.IO.Enumeration;
 using System.Reflection.Metadata.Ecma335;
@@ -80,6 +81,106 @@ namespace webScraperTest
             }
 
         }
+
+        public static List<string[]> kanjiLookup(string kanji, List<string[]> allKanji)
+        {
+            string[] kanjiInfo = new string[5];
+
+            kanjiInfo[0] = kanji;
+
+            //Kanji search
+            //Get request jisho.org
+            var httpClient = new HttpClient();
+            var htmlDocument = new HtmlDocument();
+
+            try
+            {
+                Console.WriteLine(kanji);
+                string kanjiURL = $"https://jisho.org/word/{kanji}";
+                var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
+                htmlDocument.LoadHtml(hmtl);
+            }
+            catch (AggregateException)
+            {
+                //Console.Clear();
+                Console.WriteLine("Unable to find kanji! Please Try again!");
+                return new List<string[]>();
+            }
+            //Console.Clear();
+
+            //Get JMdict ID 
+            var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
+            List<char> JMdictIDList = new List<char>();
+
+            foreach (var node in JMdictIDNodes)
+            {
+                if (node.OuterHtml.StartsWith("<a href=\"https://www.edrdg.org"))
+                {
+                    foreach (char c in node.OuterHtml.Substring(74))
+                    {
+                        if (!char.IsNumber(c)) { break; }
+                        JMdictIDList.Add(c);
+                    }
+
+                }
+
+            }
+            string JMdictID = string.Join("", JMdictIDList);
+            kanjiInfo[1] = JMdictID;
+
+            //Get Furigana
+            string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
+            kanjiInfo[2] = furigana;
+
+            //Get Meaning(s)
+            var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
+            List<string> meaningsList = new List<string>();
+            string[] meaningsBlackList = ["<spa"];
+
+            int num = 1;
+
+            foreach (var node in meaningsNodes)
+            {
+                if (meaningsBlackList.Contains(node.InnerHtml.Substring(0, 4))) { continue; }
+                meaningsList.Add($"{num}. {node.InnerHtml}");
+                num++;
+            }
+            string meanings = String.Join("-", meaningsList);
+            kanjiInfo[3] = meanings;
+
+            //Get Tags
+            var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
+            List<string> tagsList = new List<string>();
+            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
+
+            foreach (var node in tagsNodes)
+            {
+                if (tagsBlackList.Contains(node.InnerText)) { continue; }
+                tagsList.Add(node.InnerText + ",");
+            }
+
+            string strTagList = String.Join("", tagsList); //separates different tags with "-".
+            string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
+            string tags = sentencTags.Replace("&#39;", "'"); //fixes weird unicode bug.
+
+            kanjiInfo[4] = tags;
+
+            //print of array:
+            foreach (string s in kanjiInfo) { Console.WriteLine($"kanjiInfo:{s}"); }
+
+            //Check if everything is in list.
+            if (kanjiInfo.Length == 5)
+            {
+                allKanji.Add(kanjiInfo);
+            }
+            else
+            {
+                Console.WriteLine("Not enough info to add!");
+                return new List<string[]>();
+            }
+            return allKanji;
+
+        }
         
         static void Main(string[] args)
         {
@@ -91,8 +192,6 @@ namespace webScraperTest
 
             while (true)
             {
-                string[] kanjiArray = new string[5];
-
                 //Menu//
                 if (allKanjiList.Count != 0 ) 
                 {
@@ -104,123 +203,41 @@ namespace webScraperTest
                     Console.WriteLine("\n");
                 }
                 Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add a csv-string of kanji.\nInput Kanji/Kanji word:");
+
                 String kanji = Console.ReadLine().Trim().ToLower();
 
-                if (kanji == "x")
+                if (kanji == "x") //exit 
                 {
                     Console.WriteLine("Program closed!");
                     break;
                 }
 
-                if (kanji == "w" && allKanjiList.Count > 0)
+                if (kanji == "w" && allKanjiList.Count > 0) //write to file 
                 {
                     writeToFile(allKanjiList);
                     break;
                 }
 
-                if (kanji == "b")
+                if (kanji == "b") //bulk add kanji
                 {
                     Console.Clear();
-                    Console.WriteLine("BULK MODE:");
-                    string[]  csvKanji = kanji.Split(",");
+                    Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by comma ('x,y,z'):");
 
+                    string csvKanjiInput = Console.ReadLine().ToLower();
+                    string[] csvKanji = csvKanjiInput.Split(",");
+
+                    foreach (string word in csvKanji)
+                    {
+                        kanjiLookup(word, allKanjiList);
+                    }
+
+                    writeToFile(allKanjiList);
                     break;
                 }
 
-                kanjiArray[0] = kanji;
+                kanjiLookup(kanji, allKanjiList);
 
-                //Kanji search
-                //Get request jisho.org
-                var httpClient = new HttpClient();
-                var htmlDocument = new HtmlDocument();
-                
-                try 
-                {
-                    Console.WriteLine(kanji);
-                    string kanjiURL = $"https://jisho.org/word/{kanji}";
-                    var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
-                    htmlDocument.LoadHtml(hmtl);
-                }
-                catch (AggregateException)
-                {
-                    Console.Clear();
-                    Console.WriteLine("Unable to find kanji! Please Try again!");
-                    continue;
-                }
-                Console.Clear();
-
-                //Get JMdict ID 
-                var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
-                List<char> JMdictIDList = new List<char>();
-
-                foreach (var node in JMdictIDNodes)
-                {
-                    if (node.OuterHtml.StartsWith("<a href=\"https://www.edrdg.org"))
-                    {
-                        foreach (char c in node.OuterHtml.Substring(74))
-                        {
-                            if (!char.IsNumber(c)) { break; }
-                            JMdictIDList.Add(c);
-                        }
-
-                    }
-
-                }
-                string JMdictID = string.Join("", JMdictIDList);
-                kanjiArray[1] = JMdictID;
-                
-                //Get Furigana
-                string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
-                kanjiArray[2] = furigana;
-
-                //Get Meaning(s)
-                var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
-                
-                List<string> meaningsList = new List<string>();
-                string[] meaningsBlackList = ["<spa"];
-
-                int num = 1;
-
-                foreach (var node in meaningsNodes)
-                {
-                    if (meaningsBlackList.Contains(node.InnerHtml.Substring(0,4))) { continue; }
-                    meaningsList.Add($"{num}. {node.InnerHtml}");
-                    num++;
-                }
-                string meanings = String.Join("-", meaningsList);
-                kanjiArray[3] = meanings;
-
-                //Get Tags
-                var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
-                
-                List<string> tagsList = new List<string>();
-                string[] tagsBlackList = ["Wikipedia definition","verb-Other", "Other forms", "Notes"];
-
-                foreach (var node in tagsNodes)
-                {
-                    if (tagsBlackList.Contains(node.InnerText)) { continue; }
-                    tagsList.Add(node.InnerText + ",");
-                }
-
-                string strTagList = String.Join("", tagsList); //separates different tags with "-".
-                string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
-                string tags = sentencTags.Replace("&#39;", "'"); //fixes weird unicode bug.
-
-                kanjiArray[4] = tags;
-
-                //print of array:
-                //foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
-
-                //Check if everything is in list.
-                if (kanjiArray.Length == 5)
-                {
-                    allKanjiList.Add(kanjiArray);
-                }
-                else 
-                { 
-                    Console.WriteLine("Not enough info to add!"); 
-                }
-                
+                //Note 直 shows old kanji. 
             }
 
 
