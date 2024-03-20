@@ -135,13 +135,15 @@ namespace webScraperTest
             //Get Meaning(s)
             var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
             List<string> meaningsList = new List<string>();
+            string[] meaningsBlackList = ["<s"];
 
             int num = 1;
 
             foreach (var node in meaningsNodes)
             {
                 if (num > 5) { break; } //Limit of 5 meanings per kanji.
-                meaningsList.Add($"{num}. {node.InnerText}");
+                if (meaningsBlackList.Contains(node.InnerHtml.Substring(0, 2))) { continue; }
+                meaningsList.Add($"{num}. {node.InnerHtml}");
                 num++;
             }
             string meanings = String.Join("-", meaningsList);
