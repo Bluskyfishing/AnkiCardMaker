@@ -65,7 +65,6 @@ namespace webScraperTest
                                 writer.Write('"' + element + '"' + ";");
                             }
                             writer.Write('\n');
-                            writer.Close();
                         }
                     }
                     Console.WriteLine("File created successfully! " + filePath);
@@ -113,6 +112,7 @@ namespace webScraperTest
                 if (kanji == "a" && allKanjiList.Count > 0)
                 {
                     writeToFile(allKanjiList);
+                    break;
                 }
 
                 kanjiArray[0] = kanji;
