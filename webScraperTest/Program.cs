@@ -92,7 +92,7 @@ namespace webScraperTest
                 //Menu//
                 if (allKanjiList.Count != 0 ) 
                 {
-                    //Console.Clear();
+                    Console.Clear();
                     Console.WriteLine("Kanji to be added:");
                     foreach (string[] array in allKanjiList)
                     {
@@ -100,18 +100,17 @@ namespace webScraperTest
                     }
                     Console.WriteLine("\n");
                 }
-                Console.WriteLine("'x' to exit program\n'add' to add all kanji!\nInput Kanji/Kanji word:");
-                String kanji = Console.ReadLine().Trim();
+                Console.WriteLine("'x' to exit program\n'a' to add all kanji!\nInput Kanji/Kanji word:");
+                String kanji = Console.ReadLine().Trim().ToLower();
 
                 if (kanji == "x")
                 {
                     break;
                 }
 
-                if (kanji == "add" && allKanjiList.Count > 0)
+                if (kanji == "a" && allKanjiList.Count > 0)
                 {
                     writeToFile(allKanjiList);
-                    break;
                 }
 
                 kanjiArray[0] = kanji;
@@ -125,7 +124,7 @@ namespace webScraperTest
                 var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 var htmlDocument = new HtmlDocument();
                 htmlDocument.LoadHtml(hmtl);
-
+    
                 //Get JMdict ID 
                 var JMdictIDNodes = htmlDocument.DocumentNode.SelectNodes("//ul[@class='f-dropdown']/li/a");
                 List<char> JMdictIDList = new List<char>();
@@ -186,7 +185,7 @@ namespace webScraperTest
                 kanjiArray[4] = tags;
 
                 //print of array:
-                foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
+                //foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
 
                 //Check if everything is in list.
                 if (kanjiArray.Length == 5)
