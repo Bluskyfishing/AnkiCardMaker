@@ -50,14 +50,15 @@ namespace webScraperTest
                             {
                                 if (element == array[3])
                                 {
-                                    string breakElement = element.Replace("-", " <br /> "); //splits up meanings. still not numbered.
+                                    string breakElement = element.Replace("-", " <br /> "); //splits up meanings.
                                     writer.Write('"' + breakElement + '"' + ";"); 
                                     continue;
                                 }
                                 else if (element == array[4])
                                 {
-                                    string breakElement = element.Replace("-", " ");
-                                    writer.Write('"' + breakElement + '"' + ";"); //";" to autofill tags when importing:
+                                    string spacedElement = element.Replace(",.", " "); //spaces for tags in anki.
+                                    string removedCommaElement = element.Replace(',', ' '); //to not get tags with ',' and without. For tag consistancy.
+                                    writer.Write('"' + removedCommaElement + '"' + ";"); //";" to autofill tags when importing:
                                     continue;
                                 }
                                 writer.Write('"' + element + '"' + ";");
@@ -92,7 +93,7 @@ namespace webScraperTest
                 if (allKanjiList.Count != 0 ) 
                 {
                     //Console.Clear();
-                    Console.WriteLine("Kanji to be added.:");
+                    Console.WriteLine("Kanji to be added:");
                     foreach (string[] array in allKanjiList)
                     {
                         Console.Write(array[0] + ", ");
@@ -144,51 +145,45 @@ namespace webScraperTest
                 }
                 string JMdictID = string.Join("", JMdictIDList);
                 kanjiArray[1] = JMdictID;
-
-                //Console.WriteLine($"JMdictID: {JMdictID}");
-
+                
                 //Get Furigana
                 string furigana = HTMLParser.getHTMLNode(htmlDocument, "SelectSingleNode", "//span[@class='furigana']");
-
-                //Console.WriteLine($"Furigana: {furigana}");
                 kanjiArray[2] = furigana;
 
                 //Get Meaning(s)
                 var meaningsNodes = htmlDocument.DocumentNode.SelectNodes("//span[@class='meaning-meaning']");
-
+                
                 List<string> meaningsList = new List<string>();
-
-                string[] meaningsBlackList = ["unit"];
+                string[] meaningsBlackList = ["<spa"];
 
                 int num = 1;
 
                 foreach (var node in meaningsNodes)
                 {
-                    if (meaningsBlackList.Contains(node.InnerHtml)) { continue; }
+                    if (meaningsBlackList.Contains(node.InnerHtml.Substring(0,4))) { continue; }
                     meaningsList.Add($"{num}. {node.InnerHtml}");
                     num++;
                 }
                 string meanings = String.Join("-", meaningsList);
                 kanjiArray[3] = meanings;
 
-                //Console.WriteLine($"Meanins: {meanings}");
-
                 //Get Tags
                 var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
+                
                 List<string> tagsList = new List<string>();
-                string[] tagsBlackList = ["Wikipedia definition"];
+                string[] tagsBlackList = ["Wikipedia definition","verb-Other", "Other forms", "Notes"];
 
                 foreach (var node in tagsNodes)
                 {
-                    if (tagsBlackList.Contains(node.InnerHtml)) { continue; }
-                    tagsList.Add(node.InnerHtml);
+                    if (tagsBlackList.Contains(node.InnerText)) { continue; }
+                    tagsList.Add(node.InnerText + ",");
                 }
-                string strTagList = String.Join("-", tagsList); //separates different tags with "-".
-                string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
-                string tags = sentencTags.Replace("&#39", "'"); //fixes weird unicode bug.
-                kanjiArray[4] = tags;
 
-                //Console.WriteLine($"Tags: {tags}");
+                string strTagList = String.Join("", tagsList); //separates different tags with "-".
+                string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
+                string tags = sentencTags.Replace("&#39;", "'"); //fixes weird unicode bug.
+
+                kanjiArray[4] = tags;
 
                 //print of array:
                 foreach (string s in kanjiArray) { Console.WriteLine($"kanjiArray:{s}"); }
@@ -203,30 +198,6 @@ namespace webScraperTest
                     Console.WriteLine("Not enough info to add!"); 
                 }
                 
-                //Get example sentence
-                //https://tatoeba.org/en/sentences/search?from=jpn&query=%E6%84%9F%E6%83%85&to=eng&page=2
-                /*
-                int page = 1;
-
-                string sentenceURL = $"https://tatoeba.org/en/sentences/search?from=jpn&query={kanji}&to=eng&page={page}";
-                var httpClient2 = new HttpClient();
-                var hmtl2 = httpClient2.GetStringAsync(sentenceURL).Result;
-                var htmlDocument2 = new HtmlDocument();
-                htmlDocument2.LoadHtml(hmtl2);
-
-                var sentenceNodes = htmlDocument2.DocumentNode.SelectNodes("//span[@class='layout-align-start-center layout-row flex']");
-
-                foreach (var node in sentenceNodes)
-                {
-                    if (node == null)
-                    {
-                        Console.WriteLine("Null!");
-                        continue;
-                    }
-                    Console.WriteLine($"Sentence: {node.InnerHtml}");
-                    meaningNum++;
-                }
-                */
             }
 
 
