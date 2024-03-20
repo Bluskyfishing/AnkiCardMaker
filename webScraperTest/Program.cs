@@ -202,7 +202,7 @@ namespace webScraperTest
                     }
                     Console.WriteLine("\n");
                 }
-                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add a space-string of kanji.\nInput Kanji/Kanji word:");
+                Console.WriteLine("'x' to exit program.\n'w' to write to file.\n'b' to bulk add space-string kanji.\nInput Kanji/Kanji word:");
 
                 String kanji = Console.ReadLine().Trim().ToLower();
 
