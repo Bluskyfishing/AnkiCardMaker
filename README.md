@@ -80,7 +80,7 @@ Check that every line is filled out before importing:
 
 ![image](https://github.com/Bluskyfishing/AnkiCardMaker/assets/121456599/2f30fd16-f31d-4c7f-8b1a-de3f36c8f242)
 
-<h4>Additional reccomendation:</h4>
+<h4>Additional recommendation:</h4>
 Anki addon for pitch accent:
 https://ankiweb.net/shared/info/148002038
 I like to apply the pitch accent on the meaning field! :)
