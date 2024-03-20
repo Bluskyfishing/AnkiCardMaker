@@ -140,7 +140,7 @@ namespace webScraperTest
 
             foreach (var node in meaningsNodes)
             {
-                if (num > 5) { continue; } //Limit of 5 meanings per kanji.
+                if (num > 5) { break; } //Limit of 5 meanings per kanji.
                 meaningsList.Add($"{num}. {node.InnerText}");
                 num++;
             }
@@ -152,10 +152,14 @@ namespace webScraperTest
             List<string> tagsList = new List<string>();
             string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
 
+            int tagCount = 1;
+
             foreach (var node in tagsNodes)
             {
                 if (tagsBlackList.Contains(node.InnerText)) { continue; }
+                if (tagCount > 5) { break; }
                 tagsList.Add(node.InnerText + ",");
+                tagCount++;
             }
 
             string strTagList = String.Join("", tagsList); //separates different tags with "-".
