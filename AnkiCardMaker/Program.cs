@@ -38,7 +38,7 @@ namespace AnkiCardMaker
             //string fileName = $"{input}.txt";
             //string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
 
-            string currentTimeFormated = DateTime.Now.ToString(@"mm-HH-dd-MM-yyyy"); //Time for filename. Skips the need for input of filename.
+            string currentTimeFormated = DateTime.Now.ToString(@"HH-mm-dd-MM-yyyy"); //Time for filename. Skips the need for input of filename.
             string fileName = $"{currentTimeFormated}.txt";
             string filePath = Path.Combine(Environment.CurrentDirectory, fileName);
 
@@ -95,7 +95,7 @@ namespace AnkiCardMaker
 
             try
             {
-                Console.WriteLine(kanji);
+                //Console.WriteLine(kanji);
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
                 var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 htmlDocument.LoadHtml(hmtl);
@@ -149,10 +149,10 @@ namespace AnkiCardMaker
             string meanings = String.Join("-", meaningsList);
             kanjiInfo[3] = meanings;
 
-            //Get Tags
+            //Get Tags //Should be refactored.
             var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
             List<string> tagsList = new List<string>();
-            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
+            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes", ".etc.)", ".clauses"];
 
             int tagCount = 1;
 
@@ -235,7 +235,7 @@ namespace AnkiCardMaker
 
                         foreach (string word in csvKanji)
                         {
-                            kanjiLookup(word, allKanjiList);
+                            kanjiLookup(word.Trim(), allKanjiList);
                         }
 
                         writeToFile(allKanjiList);
