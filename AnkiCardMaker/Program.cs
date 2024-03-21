@@ -8,7 +8,7 @@ using System.Text;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace webScraperTest
+namespace AnkiCardMaker
 {
     internal class Program
     {
