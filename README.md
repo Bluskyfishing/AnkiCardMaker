@@ -73,7 +73,7 @@ div, a {
 .big { font-size: 50px; }
 .small { font-size: 18px;}
 ```
-After setting up:
+**After setting up:**
 go to "Import file" on anki
 file will be in "webScraperTest\bin\Debug\net8.0" named after date created .txt
 Check that every line is filled out before importing: 
