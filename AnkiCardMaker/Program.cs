@@ -142,7 +142,6 @@ namespace AnkiCardMaker
 
             foreach (var node in tagsNodes)
             {
-                Console.WriteLine(node.InnerText);
                 if (tagsBlackList.Contains(node.InnerText)) { continue; }
                 if (node.InnerText == "Expressions (phrases, clauses, etc.), Noun") 
                 {
