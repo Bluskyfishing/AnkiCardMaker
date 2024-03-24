@@ -191,7 +191,7 @@ namespace AnkiCardMaker
                     //Menu//
                     if (allKanjiList.Count != 0)
                     {
-                        Console.WriteLine("Kanji to be added:");
+                        Console.WriteLine("\nKanji to be added:");
                         foreach (string[] array in allKanjiList)
                         {
                             Console.Write(array[0] + ", ");
