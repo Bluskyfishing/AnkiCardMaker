@@ -53,19 +53,6 @@ namespace AnkiCardMaker
                             //array = [kanji, JMdictID, furigana, meanings, tags]
                             foreach (string element in array)
                             {
-                                if (element == array[3])
-                                {
-                                    string breakElement = element.Replace("-", " <br /> "); //splits up meanings.
-                                    writer.Write('"' + breakElement + '"' + ";"); 
-                                    continue;
-                                }
-                                else if (element == array[4])
-                                {
-                                    string spacedElement = element.Replace(",.", " "); //spaces for tags in anki.
-                                    string removedCommaElement = element.Replace(',', ' '); //to not get tags with ',' and without. For tag consistancy.
-                                    writer.Write('"' + removedCommaElement + '"' + ";"); //";" to autofill tags when importing:
-                                    continue;
-                                }
                                 writer.Write('"' + element + '"' + ";");
                             }
                             writer.Write('\n');
@@ -95,7 +82,6 @@ namespace AnkiCardMaker
 
             try
             {
-                //Console.WriteLine(kanji);
                 string kanjiURL = $"https://jisho.org/word/{kanji}";
                 var hmtl = httpClient.GetStringAsync(kanjiURL).Result;
                 htmlDocument.LoadHtml(hmtl);
@@ -146,27 +132,30 @@ namespace AnkiCardMaker
                 meaningsList.Add($"{num}. {node.InnerHtml}");
                 num++;
             }
-            string meanings = String.Join("-", meaningsList);
+            string meanings = string.Join(" <br /> ", meaningsList);
             kanjiInfo[3] = meanings;
 
-            //Get Tags //Should be refactored.
+            //Get Tags 
             var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
             List<string> tagsList = new List<string>();
-            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes", ".etc.)", ".clauses"];
-
-            int tagCount = 1;
+            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
 
             foreach (var node in tagsNodes)
             {
                 if (tagsBlackList.Contains(node.InnerText)) { continue; }
-                if (tagCount > 5) { break; }
-                tagsList.Add(node.InnerText + ",");
-                tagCount++;
+
+                string[] tagSplit = node.InnerText.Split(", ");
+
+                for (int i = 0; i < tagSplit.Length; i++)
+                {
+                    string noSpacetag = tagSplit[i].Replace(" ", "_"); //separates space with "_"
+                    tagsList.Add(noSpacetag + " "); 
+
+                }
             }
 
-            string strTagList = String.Join("", tagsList); //separates different tags with "-".
-            string sentencTags = strTagList.Replace(" ", "."); //Connects tag-sentences for import. Prevents generation of split tags.
-            string tags = sentencTags.Replace("&#39;", "'"); //fixes weird unicode bug.
+            string tagsString = string.Join("", tagsList);
+            string tags = tagsString.Replace("&#39;", "'"); //fixes weird unicode bug.
 
             kanjiInfo[4] = tags;
 
