@@ -89,7 +89,7 @@ namespace AnkiCardMaker
             catch (AggregateException)
             {
                 //Console.Clear();
-                Console.WriteLine($"Unable to find kanji:{kanji}\nPlease Try again!");
+                Console.WriteLine($"Unable to find kanji:{kanji}");
                 return new List<string[]>();
             }
             //Console.Clear();
@@ -143,13 +143,17 @@ namespace AnkiCardMaker
             foreach (var node in tagsNodes)
             {
                 if (tagsBlackList.Contains(node.InnerText)) { continue; }
-                if (node.InnerText.Substring(0,10) == "Expression") 
+                if (node.InnerText.Length > 35)
                 {
-                    string expressionString = node.InnerText.Substring(0, 10) + " " + node.InnerText.Substring(36) + " ";
-                    string expression = expressionString.Replace(", ", "");
+                    if (node.InnerText.Substring(0, 11) == "Expressions")
+                    {
+                        string expressionString = node.InnerText.Substring(0, 10) + " " + node.InnerText.Substring(36) + " ";
+                        string expression = expressionString.Replace(", ", "");
 
-                    tagsList.Add(expression); 
-                    continue;
+                        tagsList.Add(expression);
+                        continue;
+                    }
+
                 }
 
                 string[] tagSplit = node.InnerText.Split(", ");
@@ -168,7 +172,7 @@ namespace AnkiCardMaker
             kanjiInfo[4] = tags;
 
             //print of array:
-            foreach (string s in kanjiInfo) { Console.WriteLine($"kanjiInfo:{s}"); }
+            //foreach (string s in kanjiInfo) { Console.WriteLine($"kanjiInfo:{s}"); }
 
             //Check if everything is in list.
             if (kanjiInfo.Length == 5)
@@ -232,7 +236,13 @@ namespace AnkiCardMaker
 
                         foreach (string word in csvKanji)
                         {
-                            kanjiLookup(word.Trim(), allKanjiList);
+                            List<string[]> data = kanjiLookup(word.Trim(), allKanjiList);
+                            
+                            if (data.Count > 0) 
+                            {
+                                Console.WriteLine($"Added: {word}");
+                            }
+                            
                         }
 
                         writeToFile(allKanjiList);
