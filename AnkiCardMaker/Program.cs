@@ -138,14 +138,17 @@ namespace AnkiCardMaker
             //Get Tags 
             var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
             List<string> tagsList = new List<string>();
-            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes", "etc.)", "clauses"];
+            string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
 
             foreach (var node in tagsNodes)
             {
                 if (tagsBlackList.Contains(node.InnerText)) { continue; }
-                if (node.InnerText == "Expressions (phrases, clauses, etc.), Noun") 
+                if (node.InnerText.Substring(0,10) == "Expression") 
                 {
-                    tagsList.Add("Expression Noun ");
+                    string expressionString = node.InnerText.Substring(0, 10) + " " + node.InnerText.Substring(36) + " ";
+                    string expression = expressionString.Replace(", ", "");
+
+                    tagsList.Add(expression); 
                     continue;
                 }
 
