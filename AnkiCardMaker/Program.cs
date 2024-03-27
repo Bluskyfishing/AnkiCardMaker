@@ -240,7 +240,7 @@ namespace AnkiCardMaker
                             
                             if (data.Count > 0) 
                             {
-                                Console.WriteLine($"Added: {word}");
+                                Console.WriteLine($"Added: {word.Trim()}");
                             }
                             
                         }
