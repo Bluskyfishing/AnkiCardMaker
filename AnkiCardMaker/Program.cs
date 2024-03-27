@@ -134,11 +134,10 @@ namespace AnkiCardMaker
             kanjiInfo[3] = meanings;
 
             //Get Tags 
-
             try
             {
                 var tagsNodes = htmlDocument.DocumentNode.SelectNodes("//div[@class='meaning-tags']");
-                List<string> tagsList = new List<string>();
+                HashSet<string> tagsList = new HashSet<string>();
                 string[] tagsBlackList = ["Wikipedia definition", "verb-Other", "Other forms", "Notes"];
 
                 foreach (var node in tagsNodes)
@@ -173,7 +172,7 @@ namespace AnkiCardMaker
             }
             catch (NullReferenceException e)   
             {
-                Console.WriteLine("Couldnt find Tags! Exeption: " + e);
+                Console.WriteLine($"Couldnt find Tags! Exeption: {e}\nKanji added without tags.");
                 kanjiInfo[4] = "NOTAG";
             }
 
