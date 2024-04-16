@@ -231,10 +231,10 @@ namespace AnkiCardMaker
                     if (kanji == "b") //bulk add kanji
                     {
                         Console.Clear();
-                        Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by , ('x,y,z'):");
+                        Console.WriteLine("BULK MODE:\nInput Kanji/Kanji word separated by 、 ('x,y,z'):");
 
                         string csvKanjiInput = Console.ReadLine().ToLower();
-                        string[] csvKanji = csvKanjiInput.Split(",");
+                        string[] csvKanji = csvKanjiInput.Split("、");
 
                         foreach (string word in csvKanji)
                         {
