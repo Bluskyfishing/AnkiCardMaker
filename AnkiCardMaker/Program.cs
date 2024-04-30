@@ -76,7 +76,7 @@ namespace AnkiCardMaker
                     }
 
                     Console.WriteLine("Write a sentence for the kanji:");
-                    string sentence = Console.ReadLine();
+                    string sentence = Console.ReadLine().Trim();
 
                     kanjiLookupClass.kanjiLookup(kanji, sentence, allKanjiList);
 
