@@ -9,13 +9,13 @@ namespace AnkiCardMaker
 {
     public class kanjiLookupClass
     {
-        public static List<string[]> kanjiLookup(string kanji,string sentence, List<string[]> allKanji)
+        public static List<string[]> kanjiLookup(string kanji, List<string[]> allKanji)
         {
             string[] kanjiInfo = new string[6];
 
             kanjiInfo[0] = kanji;
 
-            kanjiInfo[1] = sentence;
+            //kanjiInfo[1] is open for adding a sentence after kanji existance is verified.
 
             //Kanji search
             //Get request jisho.org
@@ -30,7 +30,8 @@ namespace AnkiCardMaker
             }
             catch (AggregateException)
             {
-                Console.WriteLine($"Unable to find kanji:{kanji}");
+                Console.Clear();
+                Console.WriteLine($"-----Unable to find kanji: '{kanji}' -----\n");
                 return new List<string[]>();
             }
 
@@ -69,7 +70,7 @@ namespace AnkiCardMaker
             foreach (var node in meaningsNodes)
             {
                 if (num > 5) { break; } //Limit of 5 meanings per kanji.
-                if (meaningsBlackList.Contains(node.InnerHtml.Substring(0, 2))) { continue; }
+                if (meaningsBlackList.Contains(node.InnerHtml)) { continue; }
                 meaningsList.Add($"{num}. {node.InnerHtml}");
                 num++;
             }
