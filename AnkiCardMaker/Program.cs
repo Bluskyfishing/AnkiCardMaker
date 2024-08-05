@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System;
 using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.IO.Enumeration;
@@ -20,7 +21,6 @@ namespace AnkiCardMaker
             Console.InputEncoding = Encoding.UTF8;
 
             List<string[]> allKanjiList = new List<string[]>();
-            int index = 0;
             
             try
             {
@@ -46,11 +46,6 @@ namespace AnkiCardMaker
                         break;
                     }
 
-                    //if (allKanjiList.Contains(kanji)) //print notice that duplicate get index of kanji and overwrite.
-                    //{
-                    //    continue;
-                    //}
-
                     else if (kanji == "w" && allKanjiList.Count > 0) //write to file 
                     {
                         FileWriteClass.writeToFile(allKanjiList);
@@ -67,7 +62,6 @@ namespace AnkiCardMaker
 
                         foreach (string word in csvKanji)
                         {
-                            string exampleSentence = " ";
 
                             List<string[]> data = kanjiLookupClass.kanjiLookup(word.Trim(),  allKanjiList);
                             
@@ -82,28 +76,56 @@ namespace AnkiCardMaker
                         break;
                     }
 
-                    //Checks if kanji exists and adds to list of total kanji.
-                    List<string[]> kanjiInfo = kanjiLookupClass.kanjiLookup(kanji, allKanjiList);
+                    //Check for duplicate kanjis
+                    bool kanjiDuplicate = false;
 
-                    if (kanjiInfo.Count != 0)
+                    for (int i = 0; i < allKanjiList.Count; i++)
                     {
-                        if (kanjiInfo[index].Length > 5)
+
+                        if (allKanjiList[i][0] == kanji)
                         {
-                            Console.WriteLine("Write a sentence for the kanji:");
-                            string sentence = Console.ReadLine().Trim();
+                            kanjiDuplicate = true;
 
-                            kanjiInfo[index][1] = sentence;
+                            Console.WriteLine("Duplicate kanji found! Overwrite? (y/n): ");
+                            string answer = Console.ReadLine().Trim().ToLower();
 
-                            index++;
-                            Console.Clear() ;
+                            if (answer == "y") 
+                            {
+                                Console.WriteLine("Write a sentence for the kanji:");
+                                string sentence = Console.ReadLine().Trim();
+
+                                allKanjiList[i][1] = sentence;
+                                kanjiDuplicate = true;
+                            }
+                            else if (answer == "n")
+                            {
+                                Console.Clear();
+                            }
+
+                            break;
                         }
                     }
-                    else 
+
+                    if (!kanjiDuplicate)
                     {
-                        continue;
+                        //Check if kanji exists and adds to list of total kanji.
+                        List<string[]> kanjiInfo = kanjiLookupClass.kanjiLookup(kanji, allKanjiList);
+
+                        if (kanjiInfo.Count > 0) 
+                        {
+                            if (kanjiInfo[0].Length > 5)
+                            {
+                                Console.WriteLine("Write a sentence for the kanji:");
+                                string sentence = Console.ReadLine().Trim();
+
+                                kanjiInfo[0][1] = sentence;
+                                Console.Clear();
+                            }
+                        }
+                        
                     }
                     
-                    //Note 直 shows old kanji. 
+                    
                 }
             }
             catch (Exception ex) { Console.WriteLine("ERROR:" + ex.Message); }
