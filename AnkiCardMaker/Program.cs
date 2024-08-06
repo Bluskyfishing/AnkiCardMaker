@@ -96,9 +96,15 @@ namespace AnkiCardMaker
 
                                 allKanjiList[i][1] = sentence;
                                 kanjiDuplicate = true;
+
+                                Console.WriteLine($"'{kanji}' updated with new sentence: {sentence}");
+                                Thread.Sleep(2000);
+                                Console.Clear();
                             }
                             else if (answer == "n")
                             {
+                                Console.WriteLine($"Overwrite of '{kanji}' skipped!");
+                                Thread.Sleep(2000);
                                 Console.Clear();
                             }
 
