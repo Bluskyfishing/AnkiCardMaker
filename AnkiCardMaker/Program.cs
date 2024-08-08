@@ -21,7 +21,8 @@ namespace AnkiCardMaker
             Console.InputEncoding = Encoding.UTF8;
 
             List<string[]> allKanjiList = new List<string[]>();
-            
+            int index  = 0; 
+
             try
             {
                 while (true)
@@ -117,21 +118,25 @@ namespace AnkiCardMaker
                         //Check if kanji exists and adds to list of total kanji.
                         List<string[]> kanjiInfo = kanjiLookupClass.kanjiLookup(kanji, allKanjiList);
 
-                        if (kanjiInfo.Count > 0) 
+                        if (kanjiInfo.Count > 0)
                         {
                             if (kanjiInfo[0].Length > 5)
                             {
                                 Console.WriteLine("Write a sentence for the kanji:");
                                 string sentence = Console.ReadLine().Trim();
 
-                                kanjiInfo[0][1] = sentence;
+                                kanjiInfo[index][1] = sentence;
                                 Console.Clear();
                             }
                         }
+                        else 
+                        {
+                            continue;
+                        }
                         
                     }
-                    
-                    
+
+                    index++;
                 }
             }
             catch (Exception ex) { Console.WriteLine("ERROR:" + ex.Message); }
