@@ -30,10 +30,18 @@ namespace AnkiCardMaker
                     //Menu//
                     if (allKanjiList.Count != 0)
                     {
-                        Console.Write("Kanji to be added:");
+                        Console.Write($"{allKanjiList.Count} Kanji to be added: ");
+
                         foreach (string[] array in allKanjiList)
                         {
-                            Console.Write(array[0] + ",");
+                            if (array == allKanjiList.Last())
+                            {
+                                Console.Write(array[0]);
+                            }
+                            else
+                            {
+                                Console.Write(array[0] + ",");
+                            }
                         }
                         Console.WriteLine("\n");
                     }
@@ -90,7 +98,7 @@ namespace AnkiCardMaker
                             Console.WriteLine("Duplicate kanji found! Overwrite? (y/n): ");
                             string answer = Console.ReadLine().Trim().ToLower();
 
-                            if (answer == "y") 
+                            if (answer == "y")
                             {
                                 Console.WriteLine("Write a sentence for the kanji:");
                                 string sentence = Console.ReadLine().Trim();
@@ -102,7 +110,7 @@ namespace AnkiCardMaker
                                 Thread.Sleep(2000);
                                 Console.Clear();
                             }
-                            else if (answer == "n")
+                            else 
                             {
                                 Console.WriteLine($"Overwrite of '{kanji}' skipped!");
                                 Thread.Sleep(2000);
@@ -139,7 +147,7 @@ namespace AnkiCardMaker
                     index++;
                 }
             }
-            catch (Exception ex) { Console.WriteLine("ERROR:" + ex.Message); }
+            catch (Exception ex) { Console.WriteLine("Ding ERROR:" + ex.Message); }
 
             Console.ReadLine(); //stops console from closing.
         }
