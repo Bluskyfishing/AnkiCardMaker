@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Dynamic;
 using System.IO.Enumeration;
@@ -135,6 +136,7 @@ namespace AnkiCardMaker
 
                                 kanjiInfo[index][1] = sentence;
                                 Console.Clear();
+                                index++;
                             }
                         }
                         else 
@@ -144,10 +146,19 @@ namespace AnkiCardMaker
                         
                     }
 
-                    index++;
                 }
             }
-            catch (Exception ex) { Console.WriteLine("Ding ERROR:" + ex.Message); }
+            catch (Exception ex) 
+            {
+                // Get stack trace for the exception with source file information
+                var st = new StackTrace(ex, true);
+                // Get the top stack frame
+                var frame = st.GetFrame(0);
+                // Get the line number from the stack frame
+                var line = frame.GetFileLineNumber();
+
+                Console.WriteLine("Ding ERROR:" + ex.Message + "\nLine: " + line); 
+            }
 
             Console.ReadLine(); //stops console from closing.
         }
